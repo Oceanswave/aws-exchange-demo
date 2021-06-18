@@ -17,6 +17,11 @@ provider:
     images:
       aws-exchange-demo:
         path: ./
+  environment:
+    AAD_APPID: ${env:AAD_APPID}
+    AAD_ORG: ${env:AAD_ORG}
+    CERT_PATH: ${env:CERT_PATH}
+    CERT_PASSWORD: ${env:CERT_PASSWORD}
 
 # you can overwrite defaults here
 #  stage: dev
@@ -48,13 +53,11 @@ functions:
       name: aws-exchange-demo
     events:
       - httpApi:
+          path: /users/get/{userName}
+          method: get
+      - httpApi:
           path: /users/create
           method: post
-    environment:
-      AAD_APPID: ${env:AAD_APPID}
-      AAD_ORG: ${env:AAD_ORG}
-      CERT_PATH: ${env:CERT_PATH}
-      CERT_PASSWORD: ${env:CERT_PASSWORD}
 
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}

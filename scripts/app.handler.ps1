@@ -19,14 +19,26 @@ Write-Host (ConvertTo-Json -InputObject $InvocationParameters -Compress -Depth 3
 Import-Module ExchangeOnlineManagement
 Connect-ExchangeOnline -ShowProgress $false -AppId $env:AAD_APPID -CertificateFilePath "$env:CERT_PATH" -CertificatePassword (ConvertTo-SecureString -String $env:CERT_PASSWORD -AsPlainText -Force) -Organization $env:AAD_ORG
 
-try {  
-  Get-MailContact -Identity "Ryan Howard" | Format-List
+$mailContactIdentity = "Ryan Howard"
+if ($InvocationParameters.pathParameters -and ($InvocationParameters.pathParameters.userName -and -not [string]::IsNullOrEmpty($InvocationParameters.pathParameters.userName))) {
+  $mailContactIdentity = $InvocationParameters.pathParameters.userName
+}
+
+try {
+  Write-Host "Obtaining Mail Contact $mailContactIdentity"
+  $mailContact = Get-MailContact -Identity $mailContactIdentity
+  $responseBody = (ConvertTo-Json -InputObject $mailContact -Compress -Depth 3)
   
   & ./exchange_cli/exchange_cli
 
   $response = @{
+    cookies = @()
+    isBase64Encoded = $false
     statusCode = 200
-    body = "Success"
+    headers = @{
+      "content-type" = "application/json"
+    }
+    body = $responseBody 
   }
 
   Invoke-RestMethod -Method 'POST' "http://$Env:AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" -Body (ConvertTo-Json -InputObject $response -Compress -Depth 3)
