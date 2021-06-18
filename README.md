@@ -5,6 +5,18 @@
  - AWS CLI
  - Docker
 
+On Windows this can be installed using [chocolatey](https://chocolatey.org/)
+```
+choco install serverless awscli docker-desktop
+```
+
+On Mac, with homebrew
+```
+brew install serverless awscli
+brew install --cask docker
+```
+
+Run this to make sure you're calling AWS using the correct account
 ```aws sts get-caller-identity```
 
 ## Deployment instructions
@@ -17,12 +29,25 @@ In order to deploy your service, run the following command
 sls deploy
 ```
 
+## Set up environment variables
+
+For a dev environment, copy .env to .env.dev and supply the values
+
+e.g.
+
+```
+AAD_APPID=<some guid here>
+AAD_ORG=<yourtenant>.onmicrosoft.com
+CERT_PATH=./EXOv2.pfx
+CERT_PASSWORD=<certificate password>
+```
+
 ## Test your service
 
 After successful deployment, you can test your service remotely by using the following command:
 
 ```
-sls invoke --function hello
+sls invoke --function aws-exchange-demo
 ```
 ## Test Locally
 
