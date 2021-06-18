@@ -58,6 +58,11 @@ Build and test the image by running the startup command
 ./test.ps1
 ```
 
+There is also the ability to test using the [AWS Lambda Runtime Interface Emulator (RIE)](https://docs.aws.amazon.com/lambda/latest/dg/images-test.html)
+``` pwsh
+./test-rie.ps1
+```
+
 Build and start the image in an interactive shell
 ``` pwsh
 ./interact.ps1
