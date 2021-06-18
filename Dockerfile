@@ -15,7 +15,7 @@ COPY ./src/ .
 WORKDIR "/src/."
 RUN dotnet build "${CS_PROJECT_FILENAME}" -c Release -o /app/build
 
-## Publish stage
+## Publish stage - note the -r parameter so that .net core need not be installed in the final image. linux-musl-x64 is needed for alpine
 FROM build AS publish
 RUN dotnet publish "${CS_PROJECT_FILENAME}" -c Release -r linux-musl-x64 -o /app/publish
 
