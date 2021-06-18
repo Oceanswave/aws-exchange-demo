@@ -9,6 +9,9 @@ provider:
   name: aws
   lambdaHashingVersion: 20201221
   timeout: 300
+  httpApi:
+    payload: '1.0'
+    # disableDefaultEndpoint: true
   ecr:
     # In this section you can define images that will be built locally and uploaded to ECR
     images:
