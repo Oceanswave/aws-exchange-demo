@@ -8,7 +8,7 @@ frameworkVersion: '2'
 provider:
   name: aws
   lambdaHashingVersion: 20201221
-  timeout: 500
+  timeout: 300
   ecr:
     # In this section you can define images that will be built locally and uploaded to ECR
     images:
@@ -47,6 +47,12 @@ functions:
       - httpApi:
           path: /users/create
           method: post
+    environment:
+      AAD_APPID: ${env:AAD_APPID}
+      AAD_ORG: ${env:AAD_ORG}
+      CERT_PATH: ${env:CERT_PATH}
+      CERT_PASSWORD: ${env:CERT_PASSWORD}
+
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
