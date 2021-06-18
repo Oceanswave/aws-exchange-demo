@@ -13,9 +13,9 @@ SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference
 WORKDIR /var/task
 
 # Install required Powershell Modules
-RUN Install-Module ExchangeOnlineManagement -RequiredVersion 2.0.5 -force
+RUN Install-Module ExchangeOnlineManagement -RequiredVersion 2.0.5 -Scope AllUsers -Force
 #https://github.com/jborean93/omi
-RUN Install-Module PSWSMan -force && Install-WSMan
+RUN Install-Module PSWSMan -Scope AllUsers -Force && Install-WSMan
 
 # Copy PowerShell Scripts
 COPY ./scripts/ .
