@@ -24,3 +24,16 @@ After successful deployment, you can test your service remotely by using the fol
 ```
 sls invoke --function hello
 ```
+## Test Locally
+
+A couple of powershell scripts assist with testing the image locally
+
+Build and test the image by running the startup command
+``` pwsh
+./test.ps1
+```
+
+Build and start the image in an interactive shell
+``` pwsh
+./interact.ps1
+```
