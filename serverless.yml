@@ -51,6 +51,7 @@ functions:
   aws-exchange-demo:
     image:
       name: aws-exchange-demo
+    reservedConcurrency: 1 # Only allow 1 instance 
     events:
       - httpApi:
           path: /users/get/{userName}
