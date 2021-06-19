@@ -2,3 +2,4 @@
 .serverless
 .env.*
 .aws-lambda-rie
+node_modules

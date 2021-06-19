@@ -47,6 +47,9 @@ provider:
 #  environment:
 #    variable1: value1
 
+plugins:
+  - serverless-apigateway-service-proxy
+
 functions:
   aws-exchange-demo:
     image:
@@ -59,6 +62,18 @@ functions:
       - httpApi:
           path: /users/create
           method: post
+  aws-exchange-contact-processor:
+    image:
+      name: aws-exchange-demo
+    reservedConcurrency: 1
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - ContactProcessingQueue
+              - Arn
+          batchSize: 10
+          maximumBatchingWindow: 60
 
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
@@ -93,14 +108,30 @@ functions:
 #    environment:
 #      variable2: value2
 
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+# CloudFormation resource templates
+resources:
+  Resources:
+    ContactProcessingQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "Contact_Processing_Queue"
+        VisibilityTimeout: 300
+
+custom:
+  apiGatewayServiceProxies:
+    - sqs:
+        path: /process-contact
+        method: post
+        queueName: { 'Fn::GetAtt': ['ContactProcessingQueue', 'QueueName'] }
+        cors: false
+        response:
+          template:
+            # `success` is used when the integration response is 200
+            success: |-
+              { "message": "accepted" }
+            # `clientError` is used when the integration response is 400
+            clientError: |-
+              { "message": "there is an error in your request" }
+            # `serverError` is used when the integration response is 500
+            serverError: |-
+              { "message": "there was an error handling your request" }

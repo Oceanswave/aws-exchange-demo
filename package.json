@@ -1,0 +1,11 @@
+{
+  "name": "aws-exchange-demo",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {
+    "serverless": "^2.47.0"
+  },
+  "devDependencies": {
+    "serverless-apigateway-service-proxy": "^1.14.0"
+  }
+}
