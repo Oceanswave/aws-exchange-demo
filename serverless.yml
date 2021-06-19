@@ -9,8 +9,9 @@ provider:
   name: aws
   lambdaHashingVersion: 20201221
   timeout: 300
+  memorySize: 512
   httpApi:
-    payload: '1.0'
+    payload: '2.0'
     # disableDefaultEndpoint: true
   ecr:
     # In this section you can define images that will be built locally and uploaded to ECR
@@ -51,22 +52,17 @@ plugins:
   - serverless-apigateway-service-proxy
 
 functions:
-  aws-exchange-demo:
-    image:
-      name: aws-exchange-demo
-    reservedConcurrency: 1 # Only allow 1 instance 
-    events:
-      - httpApi:
-          path: /users/get/{userName}
-          method: get
-      - httpApi:
-          path: /users/create
-          method: post
   aws-exchange-contact-processor:
     image:
       name: aws-exchange-demo
     reservedConcurrency: 1
     events:
+      - http:
+          path: /users/get/{userName}
+          method: get
+      - http:
+          path: /users/create
+          method: post
       - sqs:
           arn:
             Fn::GetAtt:
@@ -74,6 +70,9 @@ functions:
               - Arn
           batchSize: 10
           maximumBatchingWindow: 60
+    environment:
+      PS_HandlerScript: app.handler.ps1
+      PS_HandlerFunction: Get-Contact
 
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}

@@ -37,4 +37,4 @@ COPY --from=publish /app/publish ./exchange_cli/
 # Copy PowerShell Scripts
 COPY ./scripts/ .
 
-ENTRYPOINT ["pwsh", "-NoExit", "-NoLogo", "-NonInteractive", "-Command", "$ErrorActionPreference='Stop'; $ProgressPreference='Continue'; $verbosePreference='SilentlyContinue';", "./app.handler.ps1"]
+ENTRYPOINT ["pwsh", "-NoExit", "-NoLogo", "-NonInteractive", "./bootstrap.ps1"]
