@@ -1,4 +1,4 @@
-name: Deploy master branch
+name: Deploy AWS Exchange Demo master branch
 
 on:
   push:
@@ -18,3 +18,7 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AAD_APPID: ${{ secrets.AAD_APPID }}
+        AAD_ORG: ${{ secrets.AAD_ORG }}
+        CERT_PATH: ${{ secrets.CERT_PATH }
+        CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }
