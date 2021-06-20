@@ -1,15 +1,63 @@
+# Cmdlet that is called when the Lambda handler is initialized
 function Initialize-Handler() {
   # Import the Exchange Online Management module and connect.
   Import-Module ExchangeOnlineManagement
   Connect-ExchangeOnline -ShowProgress $false -AppId $Env:AAD_APPID -CertificateFilePath "$Env:CERT_PATH" -CertificatePassword (ConvertTo-SecureString -String $Env:CERT_PASSWORD -AsPlainText -Force) -Organization $Env:AAD_ORG
 }
 
+# Cmdlet that is called when the Lambda handler is closing because of an error
 function Close-Handler() {
   # Disconnect from Exchange Online and exit
   Disconnect-ExchangeOnline -Confirm:$false
   Get-PSSession | Remove-PSSession
 }
 
+function Invoke-ExchangeProcessor() {
+  param ([HashTable]$InvocationParameters, [HashTable]$InvocationInfo)
+
+  # This example is a bit contrived, however, if the $InvocationParameters contains 
+  # a top-level 'Records' object then we know (in this contrived situation) that
+  # we're intending to perform an update using queued information from SQS rather 
+  #than a HTTP-based request.
+
+  if ($InvocationParameters.Records -and $InvocationParameters.Records -is [array]) {
+    $Processed = 0
+    $Result = [System.Collections.ArrayList]@()
+    Write-Information "Processing..."
+    foreach ($Record in $InvocationParameters.Records) {
+      $Data = ConvertFrom-Json $Record.body -AsHashtable
+      $Result.Add((Import-Contact -Data $Data))
+      $Processed++
+    }
+
+    $ResponseObject = @{
+      Processed = $Processed
+      Result = $Result
+    }
+
+    Write-Information "Processed $Processed records."
+
+    # Since the SQS Invocation was not HTTP related, just return our json-encoded response object
+    # In a better example, we might save this to a S3 bucket - One that triggers an SES email to be sent
+    return (ConvertTo-Json -InputObject $ResponseObject -Compress -Depth 3)
+  }
+
+  # Otherwise we're coming from API Gateway as a direct HTTP API request/response, Get a contact
+  return Get-Contact -InvocationParameters $InvocationParameters -InvocationInfo $InvocationInfo
+}
+
+# Example function to demonstrate updating a Mailbox
+function Import-Contact {
+  param ([HashTable]$Data)
+
+  # TODO: Do something with the data.
+  Write-Information (ConvertTo-Json -InputObject $Data -Compress -Depth 3)
+  return @{
+    Status = "OK"
+  }
+}
+
+# Example function to demonstrate retrieving a Mail Contact from Exchange Online
 function Get-Contact {
   param ([HashTable]$InvocationParameters, [HashTable]$InvocationInfo)
   # Use 'Ryan Howard' or get the value from a route parameter
@@ -24,7 +72,6 @@ function Get-Contact {
     $MailContact = Get-MailContact -Identity $MailContactIdentity
   } catch {
     return @{
-      cookies = @()
       isBase64Encoded = $false
       statusCode = 404
       headers = @{

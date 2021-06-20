@@ -72,7 +72,7 @@ functions:
           maximumBatchingWindow: 60
     environment:
       PS_HandlerScript: app.handler.ps1
-      PS_HandlerFunction: Get-Contact
+      PS_HandlerFunction: Invoke-ExchangeProcessor
 
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
@@ -114,7 +114,7 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "Contact_Processing_Queue"
-        VisibilityTimeout: 300
+        VisibilityTimeout: 900 # As the Exchange runspace has a 15-minute timeout, set the visibility to 15min
 
 custom:
   apiGatewayServiceProxies:
