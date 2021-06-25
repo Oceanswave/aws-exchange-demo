@@ -50,19 +50,13 @@ provider:
 
 plugins:
   - serverless-apigateway-service-proxy
-
+  - serverless-pseudo-parameters
 functions:
   aws-exchange-contact-processor:
     image:
       name: aws-exchange-demo
     reservedConcurrency: 1
     events:
-      - http:
-          path: /users/get/{userName}
-          method: get
-      - http:
-          path: /users/create
-          method: post
       - sqs:
           arn:
             Fn::GetAtt:
@@ -70,9 +64,12 @@ functions:
               - Arn
           batchSize: 10
           maximumBatchingWindow: 60
+    destinations:
+      onSuccess: "arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:Contact_Processing_Output_Queue"
     environment:
       PS_HandlerScript: app.handler.ps1
       PS_HandlerFunction: Invoke-ExchangeProcessor
+      DESTINATION_SQS_URL: https://sqs.#{AWS::Region}.amazonaws.com/#{AWS::AccountId}/Contact_Processing_Output_Queue
 
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
@@ -115,6 +112,10 @@ resources:
       Properties:
         QueueName: "Contact_Processing_Queue"
         VisibilityTimeout: 900 # As the Exchange runspace has a 15-minute timeout, set the visibility to 15min
+    ContactProcessingOutputQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "Contact_Processing_Output_Queue"
 
 custom:
   apiGatewayServiceProxies:

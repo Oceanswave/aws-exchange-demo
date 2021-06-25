@@ -1,5 +1,8 @@
 # Cmdlet that is called when the Lambda handler is initialized
 function Initialize-Handler() {
+  # Import AWS Cmdlets
+  Import-Module AWS.Tools.Installer
+  Install-AWSToolsModule AWS.Tools.SQS -CleanUp -Force
   # Import the Exchange Online Management module and connect.
   Import-Module ExchangeOnlineManagement
   Connect-ExchangeOnline -ShowProgress $false -AppId $Env:AAD_APPID -CertificateFilePath "$Env:CERT_PATH" -CertificatePassword (ConvertTo-SecureString -String $Env:CERT_PASSWORD -AsPlainText -Force) -Organization $Env:AAD_ORG
@@ -36,6 +39,13 @@ function Invoke-ExchangeProcessor() {
     }
 
     Write-Information "Processed $Processed records."
+
+    # Add a message to the out queue
+    if ($Env:DESTINATION_SQS_URL) {
+      Write-Information "Adding response to $Env:DESTINATION_SQS_URL"
+      $SQSResult = (Send-SQSMessage -MessageBody (ConvertTo-Json -InputObject $ResponseObject -Compress -Depth 3) -QueueUrl "$Env:DESTINATION_SQS_URL")
+      Write-Information $SQSResult
+    }
 
     # Since the SQS Invocation was not HTTP related, just return our json-encoded response object
     # In a better example, we might save this to a S3 bucket - One that triggers an SES email to be sent

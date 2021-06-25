@@ -23,13 +23,26 @@ RUN dotnet publish "${CS_PROJECT_FILENAME}" -c Release -r linux-musl-x64 -o /app
 FROM mcr.microsoft.com/powershell:alpine-3.12
 WORKDIR /app
 
+# Install the AWS CLI
+RUN apk add --no-cache `
+        python3 `
+        py3-pip `
+    && pip3 install --upgrade pip `
+    && pip3 install `
+        awscli `
+    && rm -rf /var/cache/apk/*
+
+# Just to make sure its installed alright
+RUN aws --version
+
 # Set the shell to powershell
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='SilentlyContinue';"]
 
 # Install required Powershell Modules
-RUN Install-Module ExchangeOnlineManagement -RequiredVersion 2.0.5 -Scope AllUsers -Force
+RUN Install-Module -Name AWS.Tools.Installer -Scope AllUsers -Force
+RUN Install-Module -Name ExchangeOnlineManagement -RequiredVersion 2.0.5 -Scope AllUsers -Force
 # https://github.com/jborean93/omi
-RUN Install-Module PSWSMan -Scope AllUsers -Force && Install-WSMan
+RUN Install-Module -Name PSWSMan -Scope AllUsers -Force && Install-WSMan
 
 # Copy the built app
 COPY --from=publish /app/publish ./exchange_cli/

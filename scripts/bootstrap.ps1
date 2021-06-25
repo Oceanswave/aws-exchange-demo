@@ -116,7 +116,9 @@ function Invoke-HandlerFunction {
     }
 
     # Now that we're all done, invoke the response API https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html#runtimes-api-response
-    $InvocationResponseResponse = Invoke-RestMethod -Method 'POST' "http://$Env:AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" -Body (ConvertTo-Json -InputObject $InvocationResponse -Compress -Depth 3)
+    $Result = (ConvertTo-Json -InputObject $InvocationResponse -Compress -Depth 3)
+    Write-Information $Result
+    $InvocationResponseResponse = Invoke-RestMethod -Method 'POST' "http://$Env:AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" -Body $Result
     Write-Information $InvocationResponseResponse
   } catch {
 
