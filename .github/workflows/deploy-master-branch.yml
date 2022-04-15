@@ -20,5 +20,5 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AAD_APPID: ${{ secrets.AAD_APPID }}
         AAD_ORG: ${{ secrets.AAD_ORG }}
-        CERT_PATH: ${{ secrets.CERT_PATH }
-        CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }
+        CERT_PATH: ${{ secrets.CERT_PATH }}
+        CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
