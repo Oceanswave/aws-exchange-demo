@@ -7,7 +7,7 @@ WORKDIR /app
 EXPOSE 443
 
 ## Build stage
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
 WORKDIR /src
 COPY ["./src/${CS_PROJECT_FILENAME}", ""]
 RUN dotnet restore "./${CS_PROJECT_FILENAME}"
