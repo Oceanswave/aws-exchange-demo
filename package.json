@@ -3,10 +3,10 @@
   "description": "",
   "version": "0.1.0",
   "dependencies": {
-    "serverless": "^2.47.0"
+    "serverless": "^4.45.0"
   },
   "devDependencies": {
-    "serverless-apigateway-service-proxy": "^1.14.0",
+    "serverless-apigateway-service-proxy": "^1.15.0",
     "serverless-pseudo-parameters": "^2.5.0"
   }
 }
